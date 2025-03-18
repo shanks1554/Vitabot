@@ -17,7 +17,7 @@ load_dotenv()
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 # Streamlit app configuration
-st.set_page_config(page_title="VitaBot", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="VitaBot", page_icon="🕊️", layout="wide")
 
 # Custom styling
 st.markdown(
@@ -92,7 +92,7 @@ Answer:
 
 # Main application logic
 def main():
-    st.title("🤖 Ask VitaBot")
+    st.title("💊 Ask VitaBot")
     st.write("**Your AI assistant for medical assistance ⚕️**")
 
     if "messages" not in st.session_state:
