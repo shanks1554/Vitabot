@@ -8,18 +8,14 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEndpoint
 
-# Constants
 DB_FAISS_PATH = "vectorstore/db_faiss"
 HUGGINGFACE_REPO_ID = "mistralai/Mistral-7B-Instruct-v0.3"
 
-# Load environment variables
 load_dotenv()
 HF_TOKEN = os.getenv("HF_TOKEN")
 
-# Streamlit app configuration
 st.set_page_config(page_title="VitaBot", page_icon="🕊️", layout="wide")
 
-# Custom styling
 st.markdown(
     """
     <style>
@@ -72,7 +68,6 @@ def load_llm():
         model_kwargs={"token": HF_TOKEN, "max_length": "512"},
     )
 
-# Custom chatbot prompt
 CUSTOM_PROMPT_TEMPLATE = """
 You are an AI healthcare assistant specializing in medicinal plants, herbal remedies, and spiritual healing.  
 Your goal is to provide **clear, empathetic, and accurate** information while ensuring user safety.  
@@ -90,7 +85,6 @@ Question:{question}
 Answer:
 """
 
-# Main application logic
 def main():
     st.title("💊 Ask VitaBot")
     st.write("**Your AI assistant for medical assistance ⚕️**")
@@ -98,18 +92,15 @@ def main():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat history
     for message in st.session_state.messages:
         if message["role"] == "user":
             st.markdown(f"<div class='user-message'>{message['content']}</div>", unsafe_allow_html=True)
         else:
             st.markdown(f"<div class='assistant-message'>{message['content']}</div>", unsafe_allow_html=True)
 
-    # User input
     prompt = st.chat_input("Message VitaBot")
 
     if prompt:
-        # Display user message
         st.markdown(f"<div class='user-message'>{prompt}</div>", unsafe_allow_html=True)
         st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -119,7 +110,6 @@ def main():
                 st.error("⚠️ Failed to load the vector store.")
                 return
 
-            # Create QA chain
             qa_chain = RetrievalQA.from_chain_type(
                 llm=load_llm(),
                 chain_type="stuff",
@@ -128,20 +118,16 @@ def main():
                 chain_type_kwargs={"prompt": set_custom_prompt(CUSTOM_PROMPT_TEMPLATE)},
             )
 
-            # Get response from model
             response = qa_chain.invoke({"query": prompt})
             result = response["result"]
-
-            # Remove unnecessary question parts
+            
             result = re.sub(r"Question:.*?\n", "", result, flags=re.DOTALL).strip()
-
-            # Display assistant message
+            
             st.markdown(f"<div class='assistant-message'>{result}</div>", unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": result})
 
         except Exception as e:
             st.error(f"⚠️ Error: {str(e)}")
 
-# Run the app
 if __name__ == "__main__":
     main()
